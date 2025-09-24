@@ -740,5 +740,87 @@ document.addEventListener('DOMContentLoaded', function() {
 
 })();
 </script>
+		<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>Pagamento PIX</title>
+  <style>
+    #resultado img {
+      width: 250px;
+      margin-top: 10px;
+    }
+    #resultado p {
+      font-size: 16px;
+      margin-top: 5px;
+      word-break: break-all;
+    }
+    button {
+      padding: 10px 20px;
+      font-size: 16px;
+      cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<h2>Doação via PIX</h2>
+<button id="gerarPix">Gerar PIX</button>
+<div id="resultado"></div>
+
+<script>
+document.getElementById('gerarPix').addEventListener('click', async () => {
+  const resultadoDiv = document.getElementById('resultado');
+  resultadoDiv.innerHTML = "Gerando PIX...";
+
+  try {
+    const resp = await fetch('/.netlify/functions/create-transaction', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        total_amount: 50, // valor em reais
+        customer: {
+          name: "João Silva",
+          email: "joao@email.com",
+          phone_number: "11999999999",
+          document: "12345678901"
+        },
+        offer_hash: "hash_da_sua_oferta",
+        product_hash: "hash_do_seu_produto",
+        title: "Doação"
+      })
+    });
+
+    const data = await resp.json();
+    console.log(data); // veja o JSON retornado pela Pepper
+
+    resultadoDiv.innerHTML = ""; // limpa
+
+    // === Ajuste aqui conforme o JSON que a Pepper retornar ===
+    const qrcodeBase64 = data?.payment?.pix?.qrcode;  // caminho do QR Code
+    const copiaCola = data?.payment?.pix?.pix_copy;  // caminho do copia e cola
+
+    if (qrcodeBase64) {
+      const img = document.createElement('img');
+      img.src = `data:image/png;base64,${qrcodeBase64}`;
+      resultadoDiv.appendChild(img);
+    }
+
+    if (copiaCola) {
+      const p = document.createElement('p');
+      p.innerText = `Copia e cola: ${copiaCola}`;
+      resultadoDiv.appendChild(p);
+    }
+
+  } catch (err) {
+    resultadoDiv.innerHTML = "Erro ao gerar PIX. Veja o console.";
+    console.error(err);
+  }
+});
+</script>
+
+</body>
+</html>
+
 <!-- ---------- fim do script ---------- -->
 </div></div></body></html>
