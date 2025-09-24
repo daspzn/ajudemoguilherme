@@ -12,7 +12,7 @@ exports.handler = async function(event) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Valor inválido' }) };
     }
 
-    const PEPPER_TOKEN = process.env.PEPPER_TOKEN; // seu token
+    const PEPPER_TOKEN = process.env.PEPPER_TOKEN; // Bearer token
     const PEPPER_API_TOKEN = process.env.PEPPER_API_TOKEN; // api_token da Pepper
     if (!PEPPER_TOKEN || !PEPPER_API_TOKEN) {
       return { statusCode: 500, body: JSON.stringify({ error: 'Token da Pepper não configurado' }) };
@@ -53,17 +53,13 @@ exports.handler = async function(event) {
       }
     };
 
-        curl -X GET "https://api.cloud.pepperpay.com.br/public/v1/transactions" \
+    // chamada para API da Pepper
+    const resp = await fetch("https://api.cloud.pepperpay.com.br/public/v1/transactions", {
       method: "POST",
       headers: {
-  -H "Authorization: Bearer PEPPER_API_TOKEN" \
-  -H "Content-Type: application/json"
-  -H "Accept: application/json"
-
-
-  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..." \
-  -H "Content-Type: application/json"
-  -H "Accept: application/json"
+        "Authorization": `Bearer ${PEPPER_TOKEN}`,
+        "Content-Type": "application/json",
+        "Accept": "application/json"
       },
       body: JSON.stringify(payload)
     });
@@ -84,8 +80,3 @@ exports.handler = async function(event) {
     };
   }
 };
-
-
-
-
-
