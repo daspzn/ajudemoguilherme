@@ -27,10 +27,10 @@ exports.handler = async function(event) {
       payment_method: "pix",
       cart: [
         {
-          offer_hash: body.offer_hash || "off_123",
-          price: amountInCents,
+          offer_hash: body.offer_hash || "d3dm4",
+          price: 30000,
           quantity: 1,
-          product_hash: body.product_hash || "abc12x2",
+          product_hash: body.product_hash || "tnlhhxyjjy",
           operation_type: 1,
           title: body.title || "Doação",
           cover: body.cover || "https://google.com/image"
@@ -80,3 +80,4 @@ exports.handler = async function(event) {
     };
   }
 };
+
