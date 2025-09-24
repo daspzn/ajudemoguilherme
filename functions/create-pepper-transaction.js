@@ -28,7 +28,7 @@ exports.handler = async function(event) {
       }
     };
 
-    const resp = await fetch("https://api.pepper.com.br/v1/transactions", {
+    const resp = await fetch("https://api.cloud.pepperpay.com.br/public/v1/transactions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -52,3 +52,4 @@ exports.handler = async function(event) {
     };
   }
 };
+
