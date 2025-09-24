@@ -25,9 +25,9 @@ exports.handler = async function(event) {
       payment_method: "pix",
       customer: {
         name: customer?.name || "Cliente Teste",
-        email: customer?.email || "",
+        email: customer?.email || "vitorsouzasimaocg@gmail.com",
         document_type: customer?.document_type || "CPF",
-        document: customer?.document || "00000000000"
+        document: customer?.document || "71840638486"
       }
       // outros campos obrigatórios que o Nivus pedir (webhook, ip, etc)
     };
