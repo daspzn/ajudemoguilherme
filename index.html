@@ -739,6 +739,22 @@ document.addEventListener('DOMContentLoaded', function() {
   });
 
 })();
+
+	const qrCodeString = data?.data?.qr_code; // pega qr_code do JSON
+if (qrCodeString) {
+  // gera QR Code na tela
+  new QRCode(resultadoDiv, {
+    text: qrCodeString,
+    width: 250,
+    height: 250
+  });
+
+  // mostra copia e cola
+  const p = document.createElement('p');
+  p.innerText = `Copia e cola: ${qrCodeString}`;
+  resultadoDiv.appendChild(p);
+}
+
 </script>
 
 <!-- ---------- fim do script ---------- -->
