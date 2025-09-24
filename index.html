@@ -737,37 +737,7 @@ document.addEventListener('DOMContentLoaded', function() {
     // Caso a modal seja carregada dinamicamente, você pode reexecutar attachListenersToValores() quando abrir a modal.
     // Exemplo: se tiver botão com id="btnOutroValor" que mostra campo, você pode chamar attachListenersToValores() novamente.
   });
-
-})();
-
-<div id="resultado"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
-<script>
-async function gerarPix() {
-  const resp = await fetch('/.netlify/functions/create-transaction', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({total_amount:50, customer:{name:"João Silva",email:"joao@email.com",phone_number:"11999999999",document:"12345678901"}, offer_hash:"hash_da_sua_oferta", product_hash:"hash_do_seu_produto", title:"Doação"})});
-  const data = await resp.json();
-  const resultadoDiv = document.getElementById('resultado');
-  resultadoDiv.innerHTML = "";
-
-  const pixCode = data?.pix?.pix_qr_code;
-  if (pixCode) {
-    // Cria QR Code
-    new QRCode(resultadoDiv, {
-      text: pixCode,
-      width: 250,
-      height: 250
-    });
-
-    // Mostra copia e cola
-    const p = document.createElement('p');
-    p.innerText = `Copia e cola: ${pixCode}`;
-    resultadoDiv.appendChild(p);
-  }
-}
-
-gerarPix();
 </script>
-
 
 <!-- ---------- fim do script ---------- -->
 </div></div></body></html>
