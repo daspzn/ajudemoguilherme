@@ -35,7 +35,7 @@ exports.handler = async function(event) {
         document_type: body.customer?.document_type || "CPF",
         document: body.customer?.document?.replace(/\D/g, '') || "11144477735" // CPF válido de teste
       },
-      webhook_url: "https://juntoscomasofia.site/webhook",
+      webhook_url: "https://juntospeloguilherme.site/webhook",
       ip: "127.0.0.1"
     };
 
