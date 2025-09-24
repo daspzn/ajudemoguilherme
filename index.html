@@ -580,22 +580,17 @@ document.addEventListener('DOMContentLoaded', function() {
 <script src="js/scripts.js"></script>
 
 <!-- Modal PIX -->
-<div id="pixModal" style="display:none; position: fixed; top:0; left:0; width:100%; height:100%; background: rgba(0,0,0,0.6); z-index:9999; justify-content:center; align-items:center;">
+<div id="pixModal" style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(0,0,0,0.6); align-items:center; justify-content:center; z-index:9999;">
   <div style="background:#fff; padding:20px; border-radius:10px; max-width:400px; width:90%; text-align:center;">
     <h3>Pagamento PIX</h3>
     <p>Copie o código abaixo ou escaneie o QR Code</p>
-    
-    <!-- Código Copia e Cola -->
-    <input id="pixCode" type="text" readonly style="width:100%; padding:8px; font-size:14px; margin-bottom:10px;">
-    <button onclick="copyPix()" style="background:#10b981; color:#fff; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">Copiar código</button>
-
-    <br><br>
-
-    <!-- QR Code -->
-    <img id="pixQr" src="" alt="QR Code PIX" style="max-width:200px; margin-top:10px;"/>
-
-    <br><br>
-    <button onclick="closePix()" style="background:#ef4444; color:#fff; padding:10px 20px; border:none; border-radius:5px; cursor:pointer;">Fechar</button>
+    <input id="pixCode" type="text" readonly style="width:100%; padding:8px; margin-bottom:10px;"/>
+    <button onclick="copyPix()">Copiar código</button>
+    <div style="margin-top:12px;">
+      <img id="pixQr" src="" alt="QR Code PIX" style="max-width:200px;"/>
+    </div>
+    <br/><br/>
+    <button onclick="closePix()">Fechar</button>
   </div>
 </div>
 
@@ -605,11 +600,9 @@ function showPix(payload, qr_url) {
   document.getElementById("pixQr").src = qr_url;
   document.getElementById("pixModal").style.display = "flex";
 }
-
 function closePix() {
   document.getElementById("pixModal").style.display = "none";
 }
-
 function copyPix() {
   const input = document.getElementById("pixCode");
   input.select();
@@ -617,25 +610,31 @@ function copyPix() {
   alert("Código PIX copiado!");
 }
 
-// exemplo de chamada ao backend
-function pagar(valor) {
-  fetch("/.netlify/functions/create-pepper-transaction", {
-    method: "POST",
-    headers: { "Content-Type": "application/json" },
-    body: JSON.stringify({ total_amount: valor })
-  })
-  .then(res => res.json())
-  .then(data => {
-    // ⚠️ ajuste os nomes dos campos conforme resposta da Pepper
-    const payload = data.pix?.payload || data.payload || "";
-    const qr_url = data.pix?.qrcode_url || data.qr_code || "";
-    showPix(payload, qr_url);
-  })
-  .catch(err => alert("Erro: " + err.message));
+// Função para chamar a função backend
+async function pagarComNivus(valor) {
+  try {
+    const resp = await fetch('/.netlify/functions/create-nivus-transaction', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ total_amount: valor, customer: { name: "", email: "" } })
+    });
+    const data = await resp.json();
+
+    // ajuste conforme o retorno do Nivus
+    const payload = data.pix?.payload || data.payload || '';
+    const qr_url = data.pix?.qrcode_url || data.qr_code || '';
+
+    if (payload && qr_url) {
+      showPix(payload, qr_url);
+    } else {
+      console.error("Resposta inesperada Nivus:", data);
+      alert("Erro ao gerar PIX. Veja console.");
+    }
+  } catch (err) {
+    alert("Erro: " + err.message);
+  }
 }
 </script>
-
-
 
 <!-- ---------- fim do script ---------- -->
 </div></div></body></html>
