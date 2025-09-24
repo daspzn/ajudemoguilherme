@@ -740,22 +740,34 @@ document.addEventListener('DOMContentLoaded', function() {
 
 })();
 
-	const qrCodeString = data?.data?.qr_code; // pega qr_code do JSON
-if (qrCodeString) {
-  // gera QR Code na tela
-  new QRCode(resultadoDiv, {
-    text: qrCodeString,
-    width: 250,
-    height: 250
-  });
+<div id="resultado"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<script>
+async function gerarPix() {
+  const resp = await fetch('/.netlify/functions/create-transaction', { method: 'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({total_amount:50, customer:{name:"João Silva",email:"joao@email.com",phone_number:"11999999999",document:"12345678901"}, offer_hash:"hash_da_sua_oferta", product_hash:"hash_do_seu_produto", title:"Doação"})});
+  const data = await resp.json();
+  const resultadoDiv = document.getElementById('resultado');
+  resultadoDiv.innerHTML = "";
 
-  // mostra copia e cola
-  const p = document.createElement('p');
-  p.innerText = `Copia e cola: ${qrCodeString}`;
-  resultadoDiv.appendChild(p);
+  const pixCode = data?.pix?.pix_qr_code;
+  if (pixCode) {
+    // Cria QR Code
+    new QRCode(resultadoDiv, {
+      text: pixCode,
+      width: 250,
+      height: 250
+    });
+
+    // Mostra copia e cola
+    const p = document.createElement('p');
+    p.innerText = `Copia e cola: ${pixCode}`;
+    resultadoDiv.appendChild(p);
+  }
 }
 
+gerarPix();
 </script>
+
 
 <!-- ---------- fim do script ---------- -->
 </div></div></body></html>
