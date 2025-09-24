@@ -53,12 +53,17 @@ exports.handler = async function(event) {
       }
     };
 
-    const resp = await fetch("https://api.cloud.pepperpay.com.br/public/v1/transactions", {
+        curl -X GET "https://api.cloud.pepperpay.com.br/public/v1/transactions" \
       method: "POST",
       headers: {
-        "Content-Type": "application/json",
-        "Accept: application/json"
-        "Authorization": `Bearer ${PEPPER_API_TOKEN}`
+  -H "Authorization: Bearer PEPPER_API_TOKEN" \
+  -H "Content-Type: application/json"
+  -H "Accept: application/json"
+
+
+  -H "Authorization: Bearer eyJ0eXAiOiJKV1QiLCJhbGciOiJIUzI1NiJ9..." \
+  -H "Content-Type: application/json"
+  -H "Accept: application/json"
       },
       body: JSON.stringify(payload)
     });
@@ -79,6 +84,7 @@ exports.handler = async function(event) {
     };
   }
 };
+
 
 
 
