@@ -439,18 +439,18 @@ Rosilei Clara</h3>
         <div class="close-modal"><svg xmlns="http://www.w3.org/2000/svg" version="1.1" xmlns:xlink="http://www.w3.org/1999/xlink" width="14" height="14" x="0" y="0" viewBox="0 0 320.591 320.591" style="enable-background:new 0 0 512 512" xml:space="preserve" class=""><g><path d="M30.391 318.583a30.37 30.37 0 0 1-21.56-7.288c-11.774-11.844-11.774-30.973 0-42.817L266.643 10.665c12.246-11.459 31.462-10.822 42.921 1.424 10.362 11.074 10.966 28.095 1.414 39.875L51.647 311.295a30.366 30.366 0 0 1-21.256 7.288z" fill="#ffffff" opacity="1" data-original="#000000" class=""></path><path d="M287.9 318.583a30.37 30.37 0 0 1-21.257-8.806L8.83 51.963C-2.078 39.225-.595 20.055 12.143 9.146c11.369-9.736 28.136-9.736 39.504 0l259.331 257.813c12.243 11.462 12.876 30.679 1.414 42.922-.456.487-.927.958-1.414 1.414a30.368 30.368 0 0 1-23.078 7.288z" fill="#ffffff" opacity="1" data-original="#000000" class=""></path></g></svg></div>
         <h2>Qual valor deseja doar?</h2>
         <div class="valores d-flex align-items-center justify-content-between flex-wrap">
-            <a href="https://go.pepperpay.com.br/d3dm4" target="_blank">R$ 30,00</a>
-            <a href="https://go.pepperpay.com.br/5x7oi" target="_blank">R$ 40,00</a>
-            <a href="https://go.pepperpay.com.br/jpzkx" target="_blank">R$ 50,00</a>
-            <a href="https://go.pepperpay.com.br/eys61" target="_blank">R$ 100,00</a>
-             <a href="https://go.pepperpay.com.br/5apbk" target="_blank">R$ 150,00</a>
-            <a href="https://go.pepperpay.com.br/ldcug" target="_blank">R$ 200,00</a>
-             <a href="https://go.pepperpay.com.br/nrxfd" target="_blank">R$ 250,00</a>
-             <a href="https://go.pepperpay.com.br/m5ax8" target="_blank">R$ 300,00</a>
-             <a href="https://go.pepperpay.com.br/la60p" target="_blank">R$ 400,00</a>
-              <a href="https://go.pepperpay.com.br/1jn0p" target="_blank">R$ 500,00</a>
-              <a href="https://go.pepperpay.com.br/q0ojw" target="_blank">R$ 750,00</a>
-             <a href="https://go.pepperpay.com.br/mhzrn" target="_blank">R$ 1000,00</a>
+            <a href= target="_blank">R$ 30,00</a>
+            <a href= target="_blank">R$ 40,00</a>
+            <a href= target="_blank">R$ 50,00</a>
+            <a href= target="_blank">R$ 100,00</a>
+             <a href= target="_blank">R$ 150,00</a>
+            <a href= target="_blank">R$ 200,00</a>
+             <a href= target="_blank">R$ 250,00</a>
+             <a href= target="_blank">R$ 300,00</a>
+             <a href= target="_blank">R$ 400,00</a>
+              <a href= target="_blank">R$ 500,00</a>
+              <a href= target="_blank">R$ 750,00</a>
+             <a href= target="_blank">R$ 1000,00</a>
             <!-- Botão Outro valor -->
             <button id="btnOutroValor" style="background:#24ca68;color:#fff;font-weight:bold;border:none;padding:10px 24px;border-radius:8px;cursor:pointer;box-shadow:0 2px 8px rgba(36,202,104,0.15);margin-top:12px;">Outro valor</button>
         </div>
@@ -613,11 +613,28 @@ function closePix() {
 function copyPix() {
   const input = document.getElementById("pixCode");
   input.select();
-  input.setSelectionRange(0, 99999);
   document.execCommand("copy");
   alert("Código PIX copiado!");
 }
+
+// exemplo de chamada ao backend
+function pagar(valor) {
+  fetch("/.netlify/functions/create-pepper-transaction", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ total_amount: valor })
+  })
+  .then(res => res.json())
+  .then(data => {
+    // ⚠️ ajuste os nomes dos campos conforme resposta da Pepper
+    const payload = data.pix?.payload || data.payload || "";
+    const qr_url = data.pix?.qrcode_url || data.qr_code || "";
+    showPix(payload, qr_url);
+  })
+  .catch(err => alert("Erro: " + err.message));
+}
 </script>
+
 
 
 <!-- ---------- fim do script ---------- -->
