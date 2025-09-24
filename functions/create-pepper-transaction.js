@@ -1,4 +1,4 @@
-// functions/create-pepper-transaction.js
+// functions/create-nivus-transaction.js
 
 exports.handler = async function(event) {
   if (event.httpMethod !== 'POST') {
@@ -7,33 +7,36 @@ exports.handler = async function(event) {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { total_amount } = body;
+    const { total_amount, customer } = body;
 
-    if (!total_amount) {
+    if (!total_amount || isNaN(total_amount)) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Valor inválido' }) };
     }
 
-    const PEPPER_API_TOKEN = process.env.PEPPER_API_TOKEN;
-    const PEPPER_TOKEN = process.env.PEPPER_TOKEN;
+    // pega token / chave da variável de ambiente
+    const NIVUS_TOKEN = process.env.NIVUS_TOKEN;  
+    if (!NIVUS_TOKEN) {
+      return { statusCode: 500, body: JSON.stringify({ error: 'Chave Nivus não configurada' }) };
+    }
 
-    // ⚠️ ajuste os campos abaixo conforme a API Pepper exigir
+    // montar payload conforme o docs da Nivus
     const payload = {
       amount: total_amount,
       payment_method: "pix",
       customer: {
-        name: "Cliente Teste",
-        email: "teste@exemplo.com",
-        document_type: "CPF",
-        document: "12345678900"
+        name: customer?.name || "Cliente Teste",
+        email: customer?.email || "",
+        document_type: customer?.document_type || "CPF",
+        document: customer?.document || "00000000000"
       }
+      // outros campos obrigatórios que o Nivus pedir (webhook, ip, etc)
     };
 
-    const resp = await fetch("https://api.cloud.pepperpay.com.br/public/v1/transactions", {
+    const resp = await fetch("https://pay.nivuspay.com.br/api/v1/transaction.getPaymentsByCustomer", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${PEPPER_API_TOKEN}`, // chave principal
-        "x-access-token": PEPPER_TOKEN               // se a Pepper exigir os 2 tokens
+        "Authorization": `Bearer ${NIVUS_TOKEN}`
       },
       body: JSON.stringify(payload)
     });
@@ -52,4 +55,3 @@ exports.handler = async function(event) {
     };
   }
 };
-
