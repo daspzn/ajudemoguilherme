@@ -28,7 +28,7 @@ exports.handler = async function(event) {
       cart: [
         {
           offer_hash: body.offer_hash || "d3dm4",
-          price: 30000,
+          price: 100000,
           quantity: 1,
           product_hash: body.product_hash || "tnlhhxyjjy",
           operation_type: 1,
@@ -80,4 +80,5 @@ exports.handler = async function(event) {
     };
   }
 };
+
 
