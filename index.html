@@ -589,39 +589,51 @@ document.addEventListener('DOMContentLoaded', function() {
   }
 
   // util: cria e abre modal simples de PIX (se já tiver um no seu HTML, remova e adapte)
-  function ensurePixModalExists(){
-    if (document.getElementById('pixGeneratedModal')) return;
-    const html = `
-      <div id="pixGeneratedModal" style="position:fixed;left:0;top:0;width:100vw;height:100vh;background:rgba(0,0,0,0.5);display:none;align-items:center;justify-content:center;z-index:99999;">
-        <div style="background:#fff;padding:20px;max-width:420px;width:92%;border-radius:12px;text-align:center;position:relative;">
-          <button id="pixModalClose" style="position:absolute;right:10px;top:8px;border:none;background:none;font-size:22px;cursor:pointer;">×</button>
-          <h3 style="margin-top:4px;">Pagamento PIX</h3>
-          <p id="pixInfo" style="font-size:14px;color:#333;margin:8px 0 4px;">Copie o payload ou escaneie o QR</p>
-          <input id="pixPayloadField" readonly style="width:100%;padding:8px;border:1px solid #ddd;border-radius:6px;font-size:14px;">
-          <div style="margin-top:10px;">
-            <button id="pixCopyBtn" style="padding:8px 12px;border-radius:6px;border:none;background:#24ca68;color:#fff;cursor:pointer;">Copiar payload</button>
-          </div>
-          <div style="margin-top:12px;">
-            <img id="pixQrImg" alt="QR PIX" style="max-width:260px;">
-          </div>
-          <div id="pixError" style="color:#b00020;margin-top:8px;display:none;"></div>
-        </div>
-      </div>
-    `;
-    document.body.insertAdjacentHTML('beforeend', html);
-    document.getElementById('pixModalClose').addEventListener('click', ()=> {
-      document.getElementById('pixGeneratedModal').style.display = 'none';
-      document.getElementById('pixError').style.display = 'none';
-    });
-    document.getElementById('pixCopyBtn').addEventListener('click', ()=>{
-      const v = document.getElementById('pixPayloadField').value;
-      if (!v) return alert('Nada para copiar');
-      navigator.clipboard.writeText(v).then(()=> alert('Payload copiado!'));
-    });
-    document.getElementById('pixGeneratedModal').addEventListener('click', function(e){
-      if (e.target === this) this.style.display = 'none';
-    });
+<button id="gerarPix">Gerar PIX</button>
+<div id="resultado"></div>
+
+<script>
+document.getElementById('gerarPix').addEventListener('click', async () => {
+  const resp = await fetch('/.netlify/functions/create-transaction', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      total_amount: 50,
+      customer: {
+        name: "João Silva",
+        email: "joao@email.com",
+        phone_number: "11999999999",
+        document: "12345678901"
+      },
+      offer_hash: "hash_da_sua_oferta",
+      product_hash: "hash_do_seu_produto",
+      title: "Doação"
+    })
+  });
+
+  const data = await resp.json();
+  console.log(data); // veja o JSON completo da Pepper
+
+  const resultadoDiv = document.getElementById('resultado');
+  resultadoDiv.innerHTML = ""; // limpa antes de adicionar
+
+  // Verifica onde está o QR Code no JSON
+  const qrcodeBase64 = data?.payment?.pix?.qrcode; // ou outro caminho que aparecer no console
+  const copiaCola = data?.payment?.pix?.pix_copy;
+
+  if (qrcodeBase64) {
+    const img = document.createElement('img');
+    img.src = `data:image/png;base64,${qrcodeBase64}`;
+    resultadoDiv.appendChild(img);
   }
+
+  if (copiaCola) {
+    const p = document.createElement('p');
+    p.innerText = `Copia e cola: ${copiaCola}`;
+    resultadoDiv.appendChild(p);
+  }
+});
+</script>
 
   // Faz a chamada para a função Netlify
   async function createTransaction(total_amount){
