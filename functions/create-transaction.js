@@ -58,7 +58,7 @@ exports.handler = async function(event) {
       headers: {
         "Content-Type": "application/json",
         "Accept: application/json"
-        "Authorization": `Bearer {PEPPER_TOKEN}`
+        "Authorization": `Bearer ${PEPPER_API_TOKEN}`
       },
       body: JSON.stringify(payload)
     });
@@ -79,6 +79,7 @@ exports.handler = async function(event) {
     };
   }
 };
+
 
 
 
