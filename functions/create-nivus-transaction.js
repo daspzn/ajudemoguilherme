@@ -1,4 +1,4 @@
-// functions/create-nivus-transaction.js
+// functions/create-transaction.js
 
 exports.handler = async function(event) {
   if (event.httpMethod !== 'POST') {
@@ -7,36 +7,43 @@ exports.handler = async function(event) {
 
   try {
     const body = JSON.parse(event.body || '{}');
-    const { total_amount, customer } = body;
-
-    if (!total_amount || isNaN(total_amount)) {
+    const total_amount = Number(body.total_amount);
+    if (!total_amount) {
       return { statusCode: 400, body: JSON.stringify({ error: 'Valor inválido' }) };
     }
 
-    // pega token / chave da variável de ambiente
-    const NIVUS_TOKEN = process.env.NIVUS_TOKEN;  
-    if (!NIVUS_TOKEN) {
-      return { statusCode: 500, body: JSON.stringify({ error: 'Chave Nivus não configurada' }) };
+    const VIPERPAY_SECRET = process.env.VIPERPAY_SECRET;
+    if (!VIPERPAY_SECRET) {
+      return { statusCode: 500, body: JSON.stringify({ error: 'Chave não configurada' }) };
     }
 
-    // montar payload conforme o docs da Nivus
     const payload = {
-      amount: total_amount,
-      payment_method: "pix",
+      external_id: body.external_id || `pedido_${Date.now()}`,
+      total_amount,
+      payment_method: "PIX",
+      items: [{
+        id: "item1",
+        title: "Doação",
+        description: "Doação via site",
+        price: total_amount,
+        quantity: 1,
+        is_physical: false
+      }],
       customer: {
-        name: customer?.name || "Cliente Teste",
-        email: customer?.email || "vitorsouzasimaocg@gmail.com",
-        document_type: customer?.document_type || "CPF",
-        document: customer?.document || "71840638486"
-      }
-      // outros campos obrigatórios que o Nivus pedir (webhook, ip, etc)
+        name: body.customer?.name || "Usuário Teste",
+        email: body.customer?.email || "teste@exemplo.com",
+        document_type: body.customer?.document_type || "CPF",
+        document: body.customer?.document?.replace(/\D/g, '') || "11144477735" // CPF válido de teste
+      },
+      webhook_url: "https://juntoscomasofia.site/webhook",
+      ip: "127.0.0.1"
     };
 
-    const resp = await fetch("https://pay.nivuspay.com.br/api/v1/transaction.getPaymentsByCustomer", {
+    const resp = await fetch("https://api.viperpay.org/v1/transactions", {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
-        "Authorization": `Bearer ${NIVUS_TOKEN}`
+        "api-secret": VIPERPAY_SECRET
       },
       body: JSON.stringify(payload)
     });
@@ -47,11 +54,13 @@ exports.handler = async function(event) {
       statusCode: resp.status,
       body: JSON.stringify(data)
     };
-
   } catch (err) {
     return {
       statusCode: 500,
-      body: JSON.stringify({ error: err.message })
+      body: JSON.stringify({
+        error: "Erro no servidor",
+        details: err.message
+      })
     };
   }
 };
